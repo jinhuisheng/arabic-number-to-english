@@ -1,8 +1,9 @@
 package example;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author huisheng.jin
@@ -10,83 +11,65 @@ import java.util.List;
  */
 public class ArabicNumberToEnglishWord {
 
-    private static HashMap<Integer, String> map;
-    private static List<DigitNumberMapper> digitNumberMappers;
-
-    static {
-        map = new HashMap<>();
-        map.put(0, "zero");
-        map.put(1, "one");
-        map.put(2, "two");
-        map.put(3, "three");
-        map.put(4, "four");
-        map.put(5, "five");
-        map.put(6, "six");
-        map.put(7, "seven");
-        map.put(8, "eight");
-        map.put(9, "nine");
-        map.put(10, "ten");
-
-        map.put(11, "eleven");
-        map.put(12, "twelve");
-        map.put(13, "thirteen");
-        map.put(14, "fourteen");
-        map.put(15, "fifteen");
-        map.put(16, "sixteen");
-        map.put(17, "seventeen");
-        map.put(18, "eighteen");
-        map.put(19, "nineteen");
-
-        map.put(20, "twenty");
-        map.put(30, "thirty");
-        map.put(40, "forty");
-        map.put(50, "fifty");
-        map.put(60, "sixty");
-        map.put(70, "seventy");
-        map.put(80, "eighty");
-        map.put(90, "ninety");
-    }
-
-    static {
-        digitNumberMappers = new ArrayList<>();
-        digitNumberMappers.add(new DigitNumberMapper(2, "biggerThanOrEqualTwentyAndLessThanOneHundred", "twenty"));
-        digitNumberMappers.add(new DigitNumberMapper(3, "biggerThanOrEqualTwentyAndLessThanOneHundred", "thirty"));
-        digitNumberMappers.add(new DigitNumberMapper(4, "biggerThanOrEqualTwentyAndLessThanOneHundred", "forty"));
-        digitNumberMappers.add(new DigitNumberMapper(5, "biggerThanOrEqualTwentyAndLessThanOneHundred", "fifty"));
-        digitNumberMappers.add(new DigitNumberMapper(6, "biggerThanOrEqualTwentyAndLessThanOneHundred", "sixty"));
-        digitNumberMappers.add(new DigitNumberMapper(7, "biggerThanOrEqualTwentyAndLessThanOneHundred", "seventy"));
-        digitNumberMappers.add(new DigitNumberMapper(8, "biggerThanOrEqualTwentyAndLessThanOneHundred", "eighty"));
-        digitNumberMappers.add(new DigitNumberMapper(9, "biggerThanOrEqualTwentyAndLessThanOneHundred", "ninety"));
-    }
+    private static final int HUNDRED_NUMBER = 100;
+    private static final int TWENTY_NUMBER = 20;
+    private static final String HUNDRED_WORD = "hundred";
+    private static final String ZERO_WORD = "zero";
+    private static final int ONE_THOUSAND_NUMBER = 1000;
 
     public static String convert(int number) {
-        if (map.containsKey(number)) {
-            return map.get(number);
+        if (WordContainer.contains(number)) {
+            return WordContainer.get(number);
         }
-        if (number >= 100) {
-            String[] digitNumbers = String.valueOf(number).split("");
-
-            String hundredNumber = "one";
-            String hundredWord = "hundred";
-            return hundredNumber + " " + hundredWord;
+        if (number > 1000000) {
+            return WordContainer.get(number / 1000000) + " million, "
+                    + convertBiggerThanOneThousandAndLessThanOneMillion(number / 1000)
+                    + convertLessThanOneThousandNumber(number % 1000);
         }
-        String[] digitNumbers = String.valueOf(number).split("");
-        return getTenDigitWord(Integer.valueOf(digitNumbers[0]), "biggerThanOrEqualTwentyAndLessThanOneHundred")
-                + " "
-                + getDigitWord(Integer.valueOf(digitNumbers[1]));
+        return convertBiggerThanOneThousandAndLessThanOneMillion(number)
+                + convertLessThanOneThousandNumber(number % 1000);
     }
 
-    private static String getDigitWord(Integer number) {
-        return map.get(number);
+    private static String convertBiggerThanOneThousandAndLessThanOneMillion(int number) {
+        String thousandNumberWord = convertLessThanOneThousandNumber(number / 1000);
+        return !thousandNumberWord.equals(ZERO_WORD)
+                ? thousandNumberWord + " thousand, "
+                : "";
     }
 
-    private static String getTenDigitWord(Integer number, String unit) {
-        return digitNumberMappers.stream()
-                .filter(item -> item.getNumber().equals(number)
-                        && item.getDigit().equals("biggerThanOrEqualTwentyAndLessThanOneHundred")
-                )
-                .findFirst()
-                .get()
-                .toString();
+    private static String convertLessThanOneThousandNumber(int number) {
+        String hundredNumberWord = convertBiggerThanHundredNumber(number);
+        String lessThanHundredWord = convertNumberLessThanOneHundred(number);
+        if (StringUtils.isNotBlank(hundredNumberWord)
+                && lessThanHundredWord.equals(ZERO_WORD)) {
+            lessThanHundredWord = "";
+        }
+        return reduce(hundredNumberWord, lessThanHundredWord);
     }
+
+    private static String convertBiggerThanHundredNumber(int number) {
+        int hundredDigitNumber = number / HUNDRED_NUMBER;
+        String hundredNumberWord = WordContainer.get(hundredDigitNumber);
+        return !hundredNumberWord.equals(ZERO_WORD)
+                ? hundredNumberWord + " " + HUNDRED_WORD
+                : "";
+    }
+
+    private static String convertNumberLessThanOneHundred(int number) {
+        number = number % HUNDRED_NUMBER;
+        if (number >= TWENTY_NUMBER) {
+            String hundredNumberWord = WordContainer.get(number - number % 10);
+            String digitNumberWord = WordContainer.get(number % 10);
+            return reduce(hundredNumberWord, digitNumberWord);
+        } else {
+            return reduce(WordContainer.get(number));
+        }
+    }
+
+    private static String reduce(String... words) {
+        return Stream.of(words)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(" "));
+    }
+
 }
