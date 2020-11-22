@@ -64,8 +64,8 @@ public class NumberToWord {
         if (number <= TWENTY_NUMBER) {
             return Words.get(number);
         } else {
-            String tenDigitWord = Words.get(number - number % 10);
-            String digitNumberWord = Words.get(number % 10);
+            String tenDigitWord = Words.get(numberCalculator.getTenDigitNumber(number));
+            String digitNumberWord = Words.get(numberCalculator.getDigitNumber(number));
             return reduce(Arrays.asList(tenDigitWord, digitNumberWord));
         }
     }

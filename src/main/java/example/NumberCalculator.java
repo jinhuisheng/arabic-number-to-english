@@ -21,4 +21,12 @@ public class NumberCalculator {
     int getThousands(int number) {
         return number / THOUSAND_NUMBER;
     }
+
+    int getDigitNumber(int number) {
+        return number % 10;
+    }
+
+    int getTenDigitNumber(int number) {
+        return number - getDigitNumber(number);
+    }
 }
