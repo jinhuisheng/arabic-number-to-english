@@ -12,15 +12,15 @@ import java.util.stream.Collectors;
  * @date 2020/11/16.
  */
 public class NumberToWord {
+    private static final String ZERO_WORD = "zero";
     private static final String HUNDRED_WORD = "hundred";
+    private static final String THOUSAND_WORD = "thousand,";
+    private static final String MILLION_WORD = "million,";
+    private static final int ZERO_NUMBER = 0;
+    private static final int TWENTY_NUMBER = 20;
     private static final int HUNDRED_NUMBER = 100;
     private static final int THOUSAND_NUMBER = 1000;
-    private static final String ZERO_WORD = "zero";
-    private static final int TWENTY_NUMBER = 20;
-    private static final int ZERO_NUMBER = 0;
-    private static final String THOUSAND_WORD = "thousand,";
-    public static final int MILLION_NUMBER = 1000000;
-    public static final String MILLION_WORD = "million,";
+    private static final int MILLION_NUMBER = 1000000;
     private final List<String> list;
     private final int number;
 
