@@ -13,13 +13,16 @@ import java.util.stream.Collectors;
  */
 public class NumberToWord {
     private static final String HUNDRED_WORD = "hundred";
+    private static final int HUNDRED_NUMBER = 100;
+    private static final int THOUSAND_NUMBER = 1000;
     private static final String ZERO_WORD = "zero";
     private static final int TWENTY_NUMBER = 20;
     private static final int ZERO_NUMBER = 0;
     private static final String THOUSAND_WORD = "thousand,";
+    public static final int MILLION_NUMBER = 1000000;
+    public static final String MILLION_WORD = "million,";
     private final List<String> list;
     private final int number;
-    private final NumberCalculator numberCalculator = new NumberCalculator();
 
     private NumberToWord(int number) {
         this.list = new ArrayList<>();
@@ -34,18 +37,25 @@ public class NumberToWord {
     }
 
     private String convert() {
-        addThousands(numberCalculator.getThousands(number));
-        addHundreds(numberCalculator.getHundreds(number));
-        addTenDigit(numberCalculator.getTenDigit(number));
+        addMillions(number / MILLION_NUMBER);
+        addThousands((number - number / MILLION_NUMBER * MILLION_NUMBER) / THOUSAND_NUMBER);
+        addHundreds(((number - number / MILLION_NUMBER * MILLION_NUMBER) % THOUSAND_NUMBER) / HUNDRED_NUMBER);
+        addTenDigit(number % THOUSAND_NUMBER % HUNDRED_NUMBER);
         return reduce(list);
     }
 
+    private void addMillions(int number) {
+        list.add(millionNumbers(number));
+    }
+
     private void addThousands(int number) {
-        list.add(hundredNumbers(numberCalculator.getHundreds(number)));
-        list.add(tenDigitNumbers(numberCalculator.getTenDigit(number)));
-        if (list.stream().anyMatch(StringUtils::isNotBlank)) {
-            list.add(THOUSAND_WORD);
+        List<String> thousandWords = new ArrayList<>();
+        thousandWords.add(hundredNumbers(number % THOUSAND_NUMBER / HUNDRED_NUMBER));
+        thousandWords.add(tenDigitNumbers(number % THOUSAND_NUMBER % HUNDRED_NUMBER));
+        if (thousandWords.stream().anyMatch(StringUtils::isNotBlank)) {
+            thousandWords.add(THOUSAND_WORD);
         }
+        list.addAll(thousandWords);
     }
 
     private void addHundreds(int hundreds) {
@@ -56,6 +66,10 @@ public class NumberToWord {
         list.add(tenDigitNumbers(number));
     }
 
+    private String millionNumbers(int millions) {
+        return millions == ZERO_NUMBER ? "" : Words.get(millions) + " " + MILLION_WORD;
+    }
+
     private String hundredNumbers(int hundreds) {
         return hundreds == ZERO_NUMBER ? "" : Words.get(hundreds) + " " + HUNDRED_WORD;
     }
@@ -64,8 +78,8 @@ public class NumberToWord {
         if (number <= TWENTY_NUMBER) {
             return Words.get(number);
         } else {
-            String tenDigitWord = Words.get(numberCalculator.getTenDigitNumber(number));
-            String digitNumberWord = Words.get(numberCalculator.getDigitNumber(number));
+            String tenDigitWord = Words.get(number - number % 10);
+            String digitNumberWord = Words.get(number % 10);
             return reduce(Arrays.asList(tenDigitWord, digitNumberWord));
         }
     }

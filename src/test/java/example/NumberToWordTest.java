@@ -73,11 +73,12 @@ public class NumberToWordTest {
                 Arguments.of("15501", "fifteen thousand, five hundred one"),
                 Arguments.of("100501", "one hundred thousand, five hundred one"),
                 Arguments.of("101501", "one hundred one thousand, five hundred one"),
-                Arguments.of("911501", "nine hundred eleven thousand, five hundred one")
+                Arguments.of("911501", "nine hundred eleven thousand, five hundred one"),
 
-//                Arguments.of("1000000", "one million,")
-//                Arguments.of("1001501", "one million, one thousand, five hundred one")
-//                Arguments.of("1201501", "one million, twenty thousand, five hundred one")
+                Arguments.of("1000000", "one million,"),
+                Arguments.of("1001501", "one million, one thousand, five hundred one"),
+                Arguments.of("1201501", "one million, two hundred one thousand, five hundred one"),
+                Arguments.of("1201711", "one million, two hundred one thousand, seven hundred eleven")
         );
     }
 
