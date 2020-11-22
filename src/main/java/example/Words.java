@@ -6,12 +6,12 @@ import java.util.HashMap;
  * @author huisheng.jin
  * @date 2020/11/19.
  */
-public class WordContainer {
+public class Words {
     private static HashMap<Integer, String> map;
 
     static {
         map = new HashMap<>();
-        map.put(0, "zero");
+        map.put(0, "");
         map.put(1, "one");
         map.put(2, "two");
         map.put(3, "three");

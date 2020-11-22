@@ -12,11 +12,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
  * @author huisheng.jin
  * @date 2020/11/16.
  */
-public class ArabicNumberToEnglishWordTest {
+public class NumberToWordTest {
 
     private static Stream<Arguments> provideArguments() {
         return Stream.of(
-
                 Arguments.of("0", "zero"),
                 Arguments.of("1", "one"),
                 Arguments.of("2", "two"),
@@ -74,10 +73,10 @@ public class ArabicNumberToEnglishWordTest {
                 Arguments.of("15501", "fifteen thousand, five hundred one"),
                 Arguments.of("100501", "one hundred thousand, five hundred one"),
                 Arguments.of("101501", "one hundred one thousand, five hundred one"),
-                Arguments.of("911501", "nine hundred eleven thousand, five hundred one"),
+                Arguments.of("911501", "nine hundred eleven thousand, five hundred one")
 
-                Arguments.of("1000000", "one million,"),
-                Arguments.of("1001501", "one million, one thousand, five hundred one")
+//                Arguments.of("1000000", "one million,")
+//                Arguments.of("1001501", "one million, one thousand, five hundred one")
 //                Arguments.of("1201501", "one million, twenty thousand, five hundred one")
         );
     }
@@ -85,7 +84,7 @@ public class ArabicNumberToEnglishWordTest {
     @ParameterizedTest
     @MethodSource("provideArguments")
     public void assertEqual(int number, String expected) {
-        assertThat(ArabicNumberToEnglishWord.convert(number)).isEqualTo(expected);
+        assertThat(NumberToWord.convert(number)).isEqualTo(expected);
     }
 
 }
