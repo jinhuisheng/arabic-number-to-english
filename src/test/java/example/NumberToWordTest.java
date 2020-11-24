@@ -47,6 +47,7 @@ public class NumberToWordTest {
 
                 Arguments.of("30", "thirty"),
                 Arguments.of("31", "thirty one"),
+                Arguments.of("39", "thirty nine"),
                 Arguments.of("40", "forty"),
                 Arguments.of("41", "forty one"),
                 Arguments.of("50", "fifty"),
@@ -54,11 +55,14 @@ public class NumberToWordTest {
                 Arguments.of("70", "seventy"),
                 Arguments.of("80", "eighty"),
                 Arguments.of("90", "ninety"),
+                Arguments.of("99", "ninety nine"),
 
                 Arguments.of("100", "one hundred"),
                 Arguments.of("101", "one hundred one"),
+                Arguments.of("109", "one hundred nine"),
                 Arguments.of("115", "one hundred fifteen"),
                 Arguments.of("121", "one hundred twenty one"),
+                Arguments.of("150", "one hundred fifty"),
                 Arguments.of("151", "one hundred fifty one"),
                 Arguments.of("419", "four hundred nineteen"),
                 Arguments.of("951", "nine hundred fifty one"),

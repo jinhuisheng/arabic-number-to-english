@@ -1,28 +1,53 @@
 package example;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 /**
  * @author huisheng.jin
- * @date 2020/11/16.
+ * @date 2020/11/24.
  */
 public class NumberToWord {
-    private static final String ZERO_WORD = "zero";
-    private static final String HUNDRED_WORD = "hundred";
-    private static final String THOUSAND_WORD = "thousand,";
-    private static final String MILLION_WORD = "million,";
-    private static final int ZERO_NUMBER = 0;
-    private static final int TWENTY_NUMBER = 20;
-    private static final int HUNDRED_NUMBER = 100;
-    private static final int THOUSAND_NUMBER = 1000;
-    private static final int MILLION_NUMBER = 1000000;
-    private final List<String> list;
+
+    public static final int TWENTY_NUMBER = 20;
+    public static final int TEN_NUMBER = 10;
+    private static HashMap<Integer, String> map;
+
+    static {
+        map = new HashMap<>();
+        map.put(0, "zero");
+        map.put(1, "one");
+        map.put(2, "two");
+        map.put(3, "three");
+        map.put(4, "four");
+        map.put(5, "five");
+        map.put(6, "six");
+        map.put(7, "seven");
+        map.put(8, "eight");
+        map.put(9, "nine");
+        map.put(10, "ten");
+        map.put(11, "eleven");
+        map.put(12, "twelve");
+        map.put(13, "thirteen");
+        map.put(14, "fourteen");
+        map.put(15, "fifteen");
+        map.put(16, "sixteen");
+        map.put(17, "seventeen");
+        map.put(18, "eighteen");
+        map.put(19, "nineteen");
+        map.put(20, "twenty");
+        map.put(30, "thirty");
+        map.put(40, "forty");
+        map.put(50, "fifty");
+        map.put(60, "sixty");
+        map.put(70, "seventy");
+        map.put(80, "eighty");
+        map.put(90, "ninety");
+    }
+
     private final int number;
+    private ArrayList<String> list;
 
     private NumberToWord(int number) {
         this.list = new ArrayList<>();
@@ -31,63 +56,70 @@ public class NumberToWord {
 
     public static String convert(int number) {
         if (number == 0) {
-            return NumberToWord.ZERO_WORD;
+            return "zero";
         }
-        return new NumberToWord(number).convert();
+        NumberToWord numberToWord = new NumberToWord(number);
+        return numberToWord.convert();
     }
 
     private String convert() {
-        addMillions(number / MILLION_NUMBER);
-        addThousands((number - number / MILLION_NUMBER * MILLION_NUMBER) / THOUSAND_NUMBER);
-        addHundreds(((number - number / MILLION_NUMBER * MILLION_NUMBER) % THOUSAND_NUMBER) / HUNDRED_NUMBER);
-        addTenDigit(number % THOUSAND_NUMBER % HUNDRED_NUMBER);
-        return reduce(list);
+        int millionNumbers = number / 1000000;
+        int thousandNumber = number % 1000000 / 1000;
+        int hundredNumber = number % 1000 / 100;
+        int tenDigitNumber = number % 100;
+        addMillionNumberWord(millionNumbers);
+        addThousandNumberWord(thousandNumber);
+        addHundredNumberWord(hundredNumber);
+        addTenDigitNumberWord(tenDigitNumber);
+        return reduce();
     }
 
-    private void addMillions(int number) {
-        list.add(millionNumbers(number));
-    }
-
-    private void addThousands(int number) {
-        List<String> thousandWords = new ArrayList<>();
-        thousandWords.add(hundredNumbers(number % THOUSAND_NUMBER / HUNDRED_NUMBER));
-        thousandWords.add(tenDigitNumbers(number % THOUSAND_NUMBER % HUNDRED_NUMBER));
-        if (thousandWords.stream().anyMatch(StringUtils::isNotBlank)) {
-            thousandWords.add(THOUSAND_WORD);
-        }
-        list.addAll(thousandWords);
-    }
-
-    private void addHundreds(int hundreds) {
-        list.add(hundredNumbers(hundreds));
-    }
-
-    private void addTenDigit(int number) {
-        list.add(tenDigitNumbers(number));
-    }
-
-    private String millionNumbers(int millions) {
-        return millions == ZERO_NUMBER ? "" : Words.get(millions) + " " + MILLION_WORD;
-    }
-
-    private String hundredNumbers(int hundreds) {
-        return hundreds == ZERO_NUMBER ? "" : Words.get(hundreds) + " " + HUNDRED_WORD;
-    }
-
-    private String tenDigitNumbers(int number) {
-        if (number <= TWENTY_NUMBER) {
-            return Words.get(number);
-        } else {
-            String tenDigitWord = Words.get(number - number % 10);
-            String digitNumberWord = Words.get(number % 10);
-            return reduce(Arrays.asList(tenDigitWord, digitNumberWord));
+    private void addMillionNumberWord(int number) {
+        if (number > 0) {
+            addThousandNumberWord(number / 1000);
+            list.add("one million,");
         }
     }
 
-    private String reduce(List<String> list) {
-        return list.stream()
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.joining(" "));
+    private void addThousandNumberWord(int number) {
+        if (number > 0) {
+            addHundredNumberWord(number / 100);
+            addTenDigitNumberWord(number % 100);
+            list.add("thousand,");
+        }
+    }
+
+    private void addHundredNumberWord(int number) {
+        if (number > 0) {
+            list.add(convertHundredDigitWord(number));
+        }
+    }
+
+    private void addTenDigitNumberWord(int number) {
+        if (number > 0) {
+            list.add(convertLessThanHundredNumber(number));
+        }
+    }
+
+    private String convertHundredDigitWord(int number) {
+        return map.get(number) + " hundred";
+    }
+
+    private String convertLessThanHundredNumber(int number) {
+        if (number < TWENTY_NUMBER) {
+            return map.get(number);
+        }
+        int digitNumber = number % TEN_NUMBER;
+        int tenDigitNumber = number - number % TEN_NUMBER;
+        String tenDigitNumberWord = map.get(tenDigitNumber);
+        String digitNumberWord = map.get(digitNumber);
+        return digitNumber == 0
+                ? tenDigitNumberWord
+                : String.join(" ", tenDigitNumberWord, digitNumberWord);
+    }
+
+    private String reduce() {
+        return list.stream().collect(Collectors.joining(" "));
     }
 
 }
